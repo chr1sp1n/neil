@@ -30,6 +30,7 @@ int radar(int position = -2){
 		//delay(150);
 		return dist;
 	}
+	return 0;
 }
 
 void scan(){
