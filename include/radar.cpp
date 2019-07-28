@@ -9,7 +9,7 @@ NewPing sonar( RADAR_TRIGGER, RADAR_ECHO, 50 );
 
 int OBSTACLE[3];
 
-int radar(int position = -2){
+int radar(int position){
 	if(position > -2){
 		radarAngle.attach(RADAR_ANGLE);
 		switch(position){
