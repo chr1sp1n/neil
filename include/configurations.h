@@ -37,7 +37,7 @@
 #define		RADAR_ANGLE			A5
 #define		RADAR_TRIGGER		A4
 #define		RADAR_ECHO			A3
-#define		RADAR_MIDDLE		85
+#define		RADAR_MIDDLE		88
 #define		RADAR_RANGE			120
 #define		RADAR_SOUND_SPEED	0.034		// cm/us
 

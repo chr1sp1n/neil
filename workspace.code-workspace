@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"name": "Neil_v0.1.0",
+			"path": "."
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.linux": {
+			"PATH": "/home/chris/.platformio/penv/bin:/home/chris/.platformio/penv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/chris/mycroft-core/bin:/home/chris/mycroft-core/bin",
+			"PLATFORMIO_CALLER": "vscode"
+		}
+	}
+}

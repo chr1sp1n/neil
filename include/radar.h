@@ -7,6 +7,6 @@
 
 #include "radar.cpp"
 
-int radar(int position);
+int radar(int position = -2);
 
 #endif	// RADAR_H

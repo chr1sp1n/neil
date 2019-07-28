@@ -1,42 +1,60 @@
 #include "configurations.h"
+#include "communications.h"
 #include "radar.h"
 #include "stepper.h"
 
 void setup() {
 	Serial.begin(SERIAL_BAUD_RATE);
 	pinMode(LED_BUILTIN, OUTPUT);
+	stepper_init( 17 ); // init stepper, set speed to 17mm/s
+}
 
-	scan();
-	for(int i = 0; i < 3; ++i){
-		Serial.println( OBSTACLE[i] );
-	}
-	stepper_init();
-	stepper_setSpeed( mmSToRpm(15) );
-	stepsToDo = stepsPerMm(10);
+unsigned int p_steps = 0;
+void fetch_command(char cmd, unsigned int mm, int deg, int mmS){
+
+	switch(cmd){
+		case 'M':	// move
+			radar(CENTER);
+			if( mmS > 0 ) stepper_setSpeed(mmS);
+			stepper_setStepsToDoAndDirection(mm, deg);
+			p_steps = stepsToDo;
+			break;
+		case 'O':	// obstacle
+			break;
+		case 'D':	// distance
+			break;
+		default:
+			break;
+	};
+
 }
 
 
+bool resp_sent = false;
+
+
 void loop() {
+	
+	communications_run(fetch_command);
+
 	stepper_run();
-	if(!running){
-		radar(CENTER);
-		if( stepsToDo > 0 ){
-			Serial.print("CENTER: ");
-			Serial.println(OBSTACLE[CENTER]);
-		}
-		if( OBSTACLE[CENTER] < 200 ){
-			stepsToDo = 0;
-			scan();
-			delay(100);
-			Serial.print("LEFT:   ");
-			Serial.print(OBSTACLE[LEFT]);
-			Serial.print("  -  CENTER: ");
-			Serial.print(OBSTACLE[CENTER]);
-			Serial.print("  -  RIGHT:  ");
-			Serial.println(OBSTACLE[RIGHT]);
-		}else{
-			delay(50);
-			stepsToDo = stepsPerMm(10);
+
+	if(!stepper_running && !resp_sent){
+		resp_sent = true;
+		communication_send('m', stepsToDo, y_position, mmS);
+	}else if(stepper_running){
+		resp_sent = false;
+		if(p_steps - stepsToDo > (STEPS_PER_ROTATION / 16)){
+			p_steps = stepsToDo;
+			int dist = radar();
+			if(dist > 0 && dist < 100){
+				communication_send('m', stepsToDo, y_position, mmS);
+				communication_send('o', dist, 0, 0);
+				stepsToDo = 0;
+			}
 		}
 	}
+
+
+
 }
