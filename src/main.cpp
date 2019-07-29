@@ -1,3 +1,4 @@
+#include <Wire.h>
 #include "configurations.h"
 #include "communications.h"
 #include "radar.h"
@@ -29,9 +30,7 @@ void fetch_command(char cmd, unsigned int mm, int deg, int mmS){
 
 }
 
-
 bool resp_sent = false;
-
 
 void loop() {
 	
@@ -44,13 +43,14 @@ void loop() {
 		communication_send('m', stepsToDo, y_position, mmS);
 	}else if(stepper_running){
 		resp_sent = false;
-		if(p_steps - stepsToDo > (STEPS_PER_ROTATION / 16)){
+		if(p_steps - stepsToDo > (STEPS_PER_ROTATION / 16)){M 
 			p_steps = stepsToDo;
 			int dist = radar();
 			if(dist > 0 && dist < 100){
-				communication_send('m', stepsToDo, y_position, mmS);
-				communication_send('o', dist, 0, 0);
+				int t_step = stepsToDo;
 				stepsToDo = 0;
+				communication_send('m', t_step, y_position, mmS);
+				communication_send('o', dist, 0, 0);
 			}
 		}
 	}
