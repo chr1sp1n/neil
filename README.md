@@ -1,4 +1,10 @@
-## Commands:
+# version history:
+
+0.1.0
+- basic functions
+
+
+# Commands:
 
 _______________________________________________
 | CMD     |  ARG 1   | ARG 2       | END LINE |
