@@ -6,39 +6,58 @@ String communications_input = "";         // a String to hold incoming data
 long get_arg(String inputString, int index){
 	
 	int start = 0;
+	int t_start = -1;
 	int stop = 0;
-	String result;
+	String result = "";
 
-	for(int i = 0; i < index + 1; ++i ){		
+	for(int i = 0; i < index + 1; ++i ){
+		t_start = inputString.indexOf( ' ', start );
+		if(t_start > -1) start = t_start + 1;
 
-		start = inputString.indexOf(' ', start) + 1;
+		// Serial.print("index: ");
+		// Serial.print(i);
+		// Serial.print(" - t_start: ");
+		// Serial.print(t_start);
+		// Serial.print(" - start: ");
+		// Serial.print(start);
 
-		if( i == index && start > -1 ){
-			stop = inputString.indexOf(' ', start) ;
+		if( i == index && t_start > -1 ){
+			
+			stop = inputString.indexOf(' ', start);
+
+
+			// Serial.print(" - stop: ");
+			// Serial.print(stop);
+
 			if(stop > -1){
-				result = inputString.substring(start, stop );
+				result = inputString.substring(start, stop);
 			}else{
 				result = inputString.substring(start);
 			}
-			return result.toInt();
-		}
 
+			// Serial.print(" - resut: ");
+			// Serial.println(result);
+
+			return result.toInt();
+		}else{
+			//Serial.println();
+		}
 	}
 
 	return 0;
 }
 
-void communication_send(char cmd, unsigned int mm, int deg, int speed){
+void communication_send(char cmd, int arg_1, int arg_2, int arg_3){
 	Serial.print(cmd);
 	Serial.print(" ");
-	Serial.print(mm);
+	Serial.print(arg_1);
 	Serial.print(" ");
-	Serial.print(deg);
+	Serial.print(arg_2);
 	Serial.print(" ");
-	Serial.println(speed);
+	Serial.println(arg_3);
 }
 
-void communications_run(void (*callback)(char cmd, unsigned int mm, int deg, int speed)){
+void communications_run(void (*callback)(char cmd, int mm_left, int mm_right, int speed)){
 
 	bool complete = false;
 	while ( Serial.available() ) {
@@ -55,29 +74,39 @@ void communications_run(void (*callback)(char cmd, unsigned int mm, int deg, int
 
 	if(complete){
 		char cmd = 0;
-		unsigned int mm = 0;
-		int deg = 0;
-		int speed = 0;
+		int arg_1 = 0;
+		int arg_2 = 0;
+		int arg_3 = 0;
+
 
 		if( communications_input.length() < 3 ){
-			Serial.println("E 1");
+			Serial.println("e 1");
 		}else{
-			if( 
-				communications_input.startsWith( "M" ) || communications_input.startsWith( "m" ) ||
-				communications_input.startsWith( "O" ) || communications_input.startsWith( "o" ) ||
-				communications_input.startsWith( "D" ) || communications_input.startsWith( "d" )
-			){
-				cmd = communications_input.charAt(0);
-				mm = get_arg(communications_input, 0);
-				deg = get_arg(communications_input, 1);
-				speed = get_arg(communications_input, 2);
-				Serial.println();
-				communication_send(cmd, mm, deg, speed);
-				(*callback)(cmd, mm, deg, speed);
-			}else{
-				Serial.println();
-				Serial.println("E 2");
+			cmd = communications_input.charAt(0);
+			communications_input.remove(0,1);
+			
+			arg_1 = get_arg(communications_input, 0);
+			//Serial.println();
+			arg_2 = get_arg(communications_input, 1);
+			//Serial.println();
+			arg_3 = get_arg(communications_input, 2);
+
+			switch(cmd){
+				case 'M':
+					cmd = 'm';
+					(*callback)(cmd, arg_1, arg_2, arg_3);
+					break;
+				case 'T':
+					cmd = 't';
+					break;
+				default:
+					cmd = 'e';
+					arg_1 = 2;
+					break;
 			}
+
+			Serial.println();
+			communication_send(cmd, arg_1, arg_2, arg_3);
 		}
 
 		communications_input = "";

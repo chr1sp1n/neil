@@ -11,14 +11,14 @@ void setup() {
 }
 
 unsigned int p_steps = 0;
-void fetch_command(char cmd, unsigned int mm, int deg, int mmS){
+void fetch_command(char cmd, int mm_left, int mm_right, int mmS){
 
 	switch(cmd){
-		case 'M':	// move
-			radar(CENTER);
+		case 'm':	// move
+			//radar(CENTER);
 			if( mmS > 0 ) stepper_setSpeed(mmS);
-			stepper_setStepsToDoAndDirection(mm, deg);
-			p_steps = stepsToDo;
+			stepper_set(mm_left, mm_right, mmS);
+			//p_steps = stepsToDo;
 			break;
 		case 'O':	// obstacle
 			break;
@@ -40,20 +40,21 @@ void loop() {
 
 	if(!stepper_running && !resp_sent){
 		resp_sent = true;
-		communication_send('m', stepsToDo, y_position, mmS);
-	}else if(stepper_running){
-		resp_sent = false;
-		if(p_steps - stepsToDo > (STEPS_PER_ROTATION / 16)){M 
-			p_steps = stepsToDo;
-			int dist = radar();
-			if(dist > 0 && dist < 100){
-				int t_step = stepsToDo;
-				stepsToDo = 0;
-				communication_send('m', t_step, y_position, mmS);
-				communication_send('o', dist, 0, 0);
-			}
-		}
+		communication_send('m', stepsToDo_left, stepsToDo_right, mmS);
 	}
+	// }else if(stepper_running){
+	// 	resp_sent = false;
+	// 	if(p_steps - stepsToDo > (STEPS_PER_ROTATION / 16)){
+	// 		p_steps = stepsToDo;
+	// 		int dist = radar();
+	// 		if(dist > 0 && dist < 100){
+	// 			unsigned int t_step = stepsToDo;
+	// 			stepsToDo = 0;
+	// 			//communication_send('m', t_step, y_position, mmS);
+	// 			communication_send('o', dist, 0, 0);
+	// 		}
+	// 	}
+	// }
 
 
 

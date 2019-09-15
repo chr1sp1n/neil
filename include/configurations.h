@@ -6,12 +6,14 @@
 
 // Stepper
 #define		X_AXIS				0
+#define		MOTOR_LEFT			0
 #define		X1					2
 #define		X2					3
 #define		X3					4
 #define		X4					5
 
 #define		Y_AXIS				1
+#define		MOTOR_RIGHT			1
 #define		Y1					6
 #define		Y2					7
 #define		Y3					8

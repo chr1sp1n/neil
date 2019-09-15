@@ -4,10 +4,10 @@
 #include <Arduino.h>
 #include "stepper.cpp"
 
-void stepper_init(unsigned int speed );
-void stepper_step(bool direction);
+void stepper_setSpeed(int rpm);
+void stepper_step(long direction_left, long direction_right);
+void stepper_set(int mm_left, int mm_right, int speed);
 void stepper_run();
-void stepper_setSpeed(byte rpm);
-void stepper_setStepsToDoAndDirection(int mm, int deg);
+void stepper_init(int speed);
 
 #endif	// STEPPER_H
