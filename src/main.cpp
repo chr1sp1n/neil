@@ -1,61 +1,63 @@
-#include <Wire.h>
+
 #include "configurations.h"
 #include "communications.h"
 #include "radar.h"
 #include "stepper.h"
+#include "accelerometer.h"
 
 void setup() {
+	Wire.begin();
+	Wire.beginTransmission(ACC_ADDRESS);
+	Wire.write(0x6B);  // PWR_MGMT_1 register
+	Wire.write(0);     // set to zero (wakes up the MPU-6050)
+	Wire.endTransmission(true);
+
+
 	Serial.begin(SERIAL_BAUD_RATE);
-	pinMode(LED_BUILTIN, OUTPUT);
+	pinMode(RADAR_TRIGGER, OUTPUT);
+	pinMode(RADAR_ECHO, INPUT);
+	
 	stepper_init( 17 ); // init stepper, set speed to 17mm/s
+	radar(CENTER);
 }
 
-unsigned int p_steps = 0;
-void fetch_command(char cmd, int mm_left, int mm_right, int mmS){
+
+void fetch_command(char cmd, int arg_1, int arg_2, int arg_3){
 
 	switch(cmd){
 		case 'm':	// move
-			//radar(CENTER);
-			if( mmS > 0 ) stepper_setSpeed(mmS);
-			stepper_set(mm_left, mm_right, mmS);
-			//p_steps = stepsToDo;
+			if( arg_3 > 0 ) stepper_setSpeed(arg_3);
+			stepper_set(arg_1, arg_2, arg_3);
 			break;
-		case 'O':	// obstacle
+		case 's':
+			stepper_set(0, 0, 0);
 			break;
-		case 'D':	// distance
+		case 'd':	// obstacle
+			arg_2 = radar(arg_1);
 			break;
-		default:
+		case 'a':	// acc
+			wire_get();
+			arg_1 = AcX;
+			arg_2 = AcY;
+			arg_3 = AcZ;
+			break;
+		case 'g':	// gyr
+			wire_get();
+			arg_1 = GyX;
+			arg_2 = GyY;
+			arg_3 = GyZ;					
+			break;
+		case 't':	// temp
+			wire_get();
+			arg_1 = Tmp / TEMPERATURE_K;
 			break;
 	};
 
+	communication_send(cmd, arg_1, arg_2, arg_3);	
 }
 
-bool resp_sent = false;
 
 void loop() {
-	
 	communications_run(fetch_command);
-
 	stepper_run();
-
-	if(!stepper_running && !resp_sent){
-		resp_sent = true;
-		communication_send('m', stepsToDo_left, stepsToDo_right, mmS);
-	}
-	// }else if(stepper_running){
-	// 	resp_sent = false;
-	// 	if(p_steps - stepsToDo > (STEPS_PER_ROTATION / 16)){
-	// 		p_steps = stepsToDo;
-	// 		int dist = radar();
-	// 		if(dist > 0 && dist < 100){
-	// 			unsigned int t_step = stepsToDo;
-	// 			stepsToDo = 0;
-	// 			//communication_send('m', t_step, y_position, mmS);
-	// 			communication_send('o', dist, 0, 0);
-	// 		}
-	// 	}
-	// }
-
-
-
 }

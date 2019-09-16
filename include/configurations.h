@@ -36,17 +36,19 @@
 
 
 // Radar
-#define		RADAR_ANGLE			A5
-#define		RADAR_TRIGGER		A4
-#define		RADAR_ECHO			A3
-#define		RADAR_MIDDLE		88
+#define		RADAR_ANGLE			10
+#define		RADAR_TRIGGER		11
+#define		RADAR_ECHO			12
+#define		RADAR_MAX_DIST		50
+
+#define		RADAR_MIDDLE		80
 #define		RADAR_RANGE			120
 #define		RADAR_SOUND_SPEED	0.034		// cm/us
 
 
 // Accelerometer 
-#define		ACC_SCL				13
-#define		ACC_SDA				12
+#define		ACC_ADDRESS			0x68
+#define 	TEMPERATURE_K		340.00 + 33.63
 
 
 #define		SERIAL_BAUD_RATE	115200

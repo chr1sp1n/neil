@@ -1,16 +1,19 @@
 #include <Arduino.h>
-#include "configurations.h"
-#include "radar.h"
 #include <Servo.h>
 #include <NewPing.h>
+#include "configurations.h"
+#include "radar.h"
 
 Servo radarAngle;
-NewPing sonar( RADAR_TRIGGER, RADAR_ECHO, 50 );
+NewPing sonar( RADAR_TRIGGER, RADAR_ECHO, RADAR_MAX_DIST );
+
+
 
 int OBSTACLE[3];
 
 int radar(int position){
-	if(position > -2){
+
+	// if(position > -2){
 		radarAngle.attach(RADAR_ANGLE);
 		switch(position){
 			case LEFT:
@@ -23,14 +26,13 @@ int radar(int position){
 				radarAngle.write((RADAR_RANGE / 2) + RADAR_MIDDLE);
 				break;		
 		}
-		//delay(300);
-	}else{
-		int dist = sonar.ping_cm() * 10;
+		// delay(300);
+	// }else{
+		int dist = sonar.ping_cm() * 10;		
 		OBSTACLE[position] = dist;
-		//delay(150);
 		return dist;
-	}
-	return 0;
+	// }
+	// return 0;
 }
 
 void scan(){
